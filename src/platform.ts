@@ -1,8 +1,10 @@
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
+import { AirQualitySensorAccessory } from './airQualitySensorAccessory';
 import { HumiditySensorAccessory } from './humiditySensorAccessory';
+import { TemperatureSensorAccessory } from './temperatureSensorAccessory';
 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
-import { TemperatureSensorAccessory } from './temperatureSensorAccessory';
+import { ApiConfig, Device } from './model';
 
 export class Platform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service = this.api.hap.Service;
@@ -20,7 +22,7 @@ export class Platform implements DynamicPlatformPlugin {
 
     this.api.on('didFinishLaunching', () => {
       log.debug('Executed didFinishLaunching callback');
-      this.discoverDevices();
+      this.discoverDevices(this.config.api as Array<ApiConfig>);
     });
   }
 
@@ -29,20 +31,29 @@ export class Platform implements DynamicPlatformPlugin {
     this.accessories.push(accessory);
   }
 
-  discoverDevices() {
+  discoverDevices(api: ApiConfig[]) {
 
-    const devices = [
-      {
-        uniqueId: 'bi-temperature-sensor-1',
+    const devices: Device[] = []; 
+    api.forEach(apiItem => {
+      devices.push({
+        uniqueId: `bi-temperature-sensor-${apiItem.name}`,
         displayName: 'BI Temperature Sensor',
         accessoryType: TemperatureSensorAccessory,
-      },
-      {
-        uniqueId: 'bi-humidity-sensor-1',
+        apiUrl: apiItem.url,
+      });
+      devices.push({
+        uniqueId: `bi-humidity-sensor-${apiItem.name}`,
         displayName: 'BI Humidity Sensor',
         accessoryType: HumiditySensorAccessory,
-      },
-    ];
+        apiUrl: apiItem.url,
+      });
+      devices.push({
+        uniqueId: `bi-air-quality-sensor-${apiItem.name}`,
+        displayName: 'BI Air Quality Sensor',
+        accessoryType: AirQualitySensorAccessory,
+        apiUrl: apiItem.url,
+      });
+    });
 
     for (const device of devices) {
       const uuid = this.api.hap.uuid.generate(device.uniqueId);
@@ -52,7 +63,7 @@ export class Platform implements DynamicPlatformPlugin {
         if (device) {
           this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
-          new device.accessoryType(this, existingAccessory);
+          new device.accessoryType(this, existingAccessory, device.apiUrl);
           this.api.updatePlatformAccessories([existingAccessory]);
         } else if (!device) {
           this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
@@ -64,7 +75,7 @@ export class Platform implements DynamicPlatformPlugin {
         const accessory = new this.api.platformAccessory(device.displayName, uuid);
         accessory.context.device = device;
 
-        new device.accessoryType(this, accessory);
+        new device.accessoryType(this, accessory, device.apiUrl);
         this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       }
     }

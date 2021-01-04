@@ -19,6 +19,7 @@ export class TemperatureSensorAccessory {
   constructor(
     private readonly platform: Platform,
     private readonly accessory: PlatformAccessory,
+    private readonly apiUrl: string,
   ) {
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
@@ -38,7 +39,7 @@ export class TemperatureSensorAccessory {
       .on('get', this.getOn.bind(this));
 
     this.intervalId = setInterval(async () => {
-      const { temperature } = await getDeviceStats(this.platform.log);
+      const { temperature } = await getDeviceStats(this.apiUrl, this.platform.log);
       this.state.temperature = temperature;
       this.platform.log.info('Updated Current Temperature ->', this.state.temperature);
     }, 60 * 1000);

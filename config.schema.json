@@ -10,6 +10,28 @@
         "type": "string",
         "required": false,
         "default": "Air BI Platform"
+      },
+      "api": {
+        "title": "Watched APIs",
+        "type": "array",
+        "items": {
+          "title": "Place API",
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Place name",
+              "type": "string",
+              "placeholder": "Enter place name...",
+              "required": true
+            },
+            "url": {
+              "title": "Place url",
+              "type": "string",
+              "placeholder": "Enter API url...",
+              "required": true
+            }
+          }
+        }
       }
     }
   }

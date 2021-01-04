@@ -19,6 +19,7 @@ export class HumiditySensorAccessory {
   constructor(
     private readonly platform: Platform,
     private readonly accessory: PlatformAccessory,
+    private readonly apiUrl: string,
   ) {
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
@@ -38,7 +39,7 @@ export class HumiditySensorAccessory {
       .on('get', this.getOn.bind(this));
 
     this.intervalId = setInterval(async () => {
-      const { humidity } = await getDeviceStats(this.platform.log);
+      const { humidity } = await getDeviceStats(this.apiUrl, this.platform.log);
       this.state.humidity = humidity;
       this.platform.log.info('Updated Current Humidity ->', this.state.humidity);
     }, 60 * 1000);

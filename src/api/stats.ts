@@ -2,9 +2,9 @@ import { Logger } from 'homebridge';
 import { request, RequestConfig } from '.';
 import { DeviceStats } from '../model';
 
-export async function getDeviceStats(logger: Logger): Promise<DeviceStats> {
+export async function getDeviceStats(url: string, logger: Logger): Promise<DeviceStats> {
   const config: RequestConfig = {
-    url: 'http://air.beskidinstruments.com/api/rest/201707250005/?token=1b60169caa7589435f66d1f11af8fe1c',
+    url,
     method: 'GET',
   };
 
