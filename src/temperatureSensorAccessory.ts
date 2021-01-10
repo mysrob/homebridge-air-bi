@@ -36,6 +36,7 @@ export class TemperatureSensorAccessory {
 
     this.service
       .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+      .setProps({ minValue: -100 })
       .on('get', this.getOn.bind(this));
 
     this.intervalId = setInterval(async () => {
