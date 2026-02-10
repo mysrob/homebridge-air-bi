@@ -26,7 +26,7 @@
     "homebridge-plugin"
   ],
   "dependencies": {
-    "axios": "^0.21.0",
+    "axios": "^1.13.5",
     "axios-cache-adapter": "^2.5.0"
   },
   "devDependencies": {
